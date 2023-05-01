@@ -1,23 +1,33 @@
 <?php
-namespace ZendSkeletonModule;
+namespace SteamApi;
 
-use Zend\ServiceManager\Factory\InvokableFactory;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 return [
     'controllers' => [
         'factories' => [
-            Controller\SkeletonController::class => InvokableFactory::class,
+            Controller\SteamController::class => Controller\Factory\SteamControllerFactory::class,
+            Controller\IndexController::class => InvokableFactory::class,
+        ],
+        'aliases' => [
+            'steambeheer' => Controller\SteamController::class,
+            'steamindex' => Controller\IndexController::class
         ],
     ],
     'router' => [
         'routes' => [
-            'module-name-here' => [
-                'type'    => 'Literal',
+            'SteamApi' => [
+                'type'    => 'segment',
                 'options' => [
                     // Change this to something specific to your module
-                    'route'    => '/module-specific-root',
+                    'route' => '/steam[/:action][/:id]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[0-9]+',
+                    ],
                     'defaults' => [
-                        'controller'    => Controller\SkeletonController::class,
+                        'controller'    => 'steamindex',
                         'action'        => 'index',
                     ],
                 ],
@@ -29,9 +39,40 @@ return [
             ],
         ],
     ],
+    'access_filter' => [
+        'options' => [
+            'mode' => 'restrictive'
+        ],
+        'controllers' => [
+            'steamindex' => [
+                ['actions' => '*', 'allow' => '*']
+            ],
+        ]
+    ],
     'view_manager' => [
         'template_path_stack' => [
-            'ZendSkeletonModule' => __DIR__ . '/../view',
+            'steamapi' => __DIR__ . '/../view',
         ],
+    ],
+    'doctrine' => [
+        'driver' => [
+            __NAMESPACE__ . '_driver' => [
+                'class' => AnnotationDriver::class,
+                'cache' => 'array',
+                'paths' => [__DIR__ . '/../src/Entity']
+            ],
+            'orm_default' => [
+                'drivers' => [
+                    __NAMESPACE__ . '\Entity' => __NAMESPACE__ . '_driver'
+                ]
+            ]
+        ]
+    ],
+    'steamApi' => [
+       'Steam-Web-API-key' => '',
+        'Steam-id' => '',
+        'format' => 'json', #json/xml/vdf
+        'version' => 'v0001',
+        'url' => 'https://api.steampowered.com'
     ],
 ];
