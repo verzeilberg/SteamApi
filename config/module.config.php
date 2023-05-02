@@ -7,11 +7,9 @@ use Laminas\ServiceManager\Factory\InvokableFactory;
 return [
     'controllers' => [
         'factories' => [
-            Controller\SteamController::class => Controller\Factory\SteamControllerFactory::class,
             Controller\IndexController::class => InvokableFactory::class,
         ],
         'aliases' => [
-            'steambeheer' => Controller\SteamController::class,
             'steamindex' => Controller\IndexController::class
         ],
     ],
@@ -20,7 +18,6 @@ return [
             'SteamApi' => [
                 'type'    => 'segment',
                 'options' => [
-                    // Change this to something specific to your module
                     'route' => '/steam[/:action][/:id]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
@@ -69,10 +66,10 @@ return [
         ]
     ],
     'steamApi' => [
-       'Steam-Web-API-key' => '',
+        'url' => 'http://api.steampowered.com',
+        'Steam-Web-API-key' => '',
         'Steam-id' => '',
-        'format' => 'json', #json/xml/vdf
-        'version' => 'v0001',
-        'url' => 'https://api.steampowered.com'
+        'format' => '', #json/xml
+        'version' => 'v0001'
     ],
 ];
